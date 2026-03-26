@@ -1,7 +1,14 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTable, useSingleton } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
+import CountdownTimer from './CountdownTimer';
+import TransportPlanner from './TransportPlanner';
+import CurrencyConverter from './CurrencyConverter';
+import RestaurantBookmarks from './RestaurantBookmarks';
+import MapView from './MapView';
+import PhotoJournal from './PhotoJournal';
+import PhraseBook from './PhraseBook';
 
 // ─── Constants ───
 const COLOR_PRESETS = [
@@ -464,25 +471,59 @@ function BudgetTracker({ cities, stays }) {
   );
 }
 
-// ─── Notes ───
+// ─── Weather Data (May averages) ───
+const WEATHER_DATA = {
+  rome: { high: 24, low: 14, rain: 4, icon: '☀️', desc: 'Warm & sunny' },
+  sorrento: { high: 23, low: 15, rain: 5, icon: '🌤️', desc: 'Warm, occasional showers' },
+  florence: { high: 24, low: 13, rain: 6, icon: '🌤️', desc: 'Warm, some rain' },
+  venice: { high: 22, low: 13, rain: 7, icon: '🌤️', desc: 'Mild, can be humid' },
+  london: { high: 17, low: 9, rain: 8, icon: '🌦️', desc: 'Cool, pack layers' },
+  milan: { high: 23, low: 13, rain: 8, icon: '🌤️', desc: 'Warm but rainy' },
+  naples: { high: 23, low: 14, rain: 5, icon: '☀️', desc: 'Warm & pleasant' },
+};
+
+function WeatherBadge({ cityId }) {
+  const key = cityId.toLowerCase().replace(/[^a-z]/g, '');
+  const w = WEATHER_DATA[key];
+  if (!w) return null;
+  return (
+    <div style={{ display:'flex',alignItems:'center',gap:6,fontSize:11,color:'var(--text-muted)',fontFamily:F,padding:'3px 8px',borderRadius:8,background:'var(--subtle-bg)',border:'1px solid var(--border)' }}>
+      <span>{w.icon}</span>
+      <span>{w.high}°/{w.low}°C</span>
+      <span style={{ opacity:0.6 }}>·</span>
+      <span>{w.desc}</span>
+    </div>
+  );
+}
+
+// ─── Notes (with search) ───
 function NotesTab({ cities }) {
   const { data:notes, insert:insertNote, remove:removeNote } = useTable('notes', { orderBy:'created_at' });
   const [newNote,setNewNote]=useState({city_id:cities[0]?.id||"",text:""});
+  const [search,setSearch]=useState("");
+
+  const filteredNotes = search.trim()
+    ? notes.filter(n=>n.text.toLowerCase().includes(search.toLowerCase()))
+    : notes;
+
   return (
     <div>
+      <div style={{ marginBottom:16 }}>
+        <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search notes..." style={{ width:"100%",padding:"10px 14px",borderRadius:10,border:"1.5px solid var(--border)",background:"var(--card-bg)",fontSize:13,fontFamily:F,color:"var(--text)",outline:"none",boxSizing:"border-box" }}/>
+      </div>
       <div style={{ display:"flex",gap:10,marginBottom:24 }}>
-        <select value={newNote.city_id} onChange={e=>setNewNote(p=>({...p,city_id:e.target.value}))} style={{ padding:"10px 14px",borderRadius:10,border:"1.5px solid #E8E0D4",background:"#FDFAF6",fontSize:13,fontFamily:F,color:"#4A3728" }}>{cities.map(c=><option key={c.id} value={c.id}>{c.emoji} {c.name}</option>)}</select>
-        <input placeholder="Add a note..." value={newNote.text} onChange={e=>setNewNote(p=>({...p,text:e.target.value}))} onKeyDown={e=>{if(e.key==="Enter"&&newNote.text.trim()){insertNote({id:uid(),...newNote});setNewNote({city_id:cities[0]?.id||"",text:""});}}} style={{ flex:1,padding:"10px 14px",borderRadius:10,border:"1.5px solid #E8E0D4",background:"#FDFAF6",fontSize:13,fontFamily:F,color:"#4A3728",outline:"none" }}/>
+        <select value={newNote.city_id} onChange={e=>setNewNote(p=>({...p,city_id:e.target.value}))} style={{ padding:"10px 14px",borderRadius:10,border:"1.5px solid var(--border)",background:"var(--card-bg)",fontSize:13,fontFamily:F,color:"var(--text)" }}>{cities.map(c=><option key={c.id} value={c.id}>{c.emoji} {c.name}</option>)}</select>
+        <input placeholder="Add a note..." value={newNote.text} onChange={e=>setNewNote(p=>({...p,text:e.target.value}))} onKeyDown={e=>{if(e.key==="Enter"&&newNote.text.trim()){insertNote({id:uid(),...newNote});setNewNote({city_id:cities[0]?.id||"",text:""});}}} style={{ flex:1,padding:"10px 14px",borderRadius:10,border:"1.5px solid var(--border)",background:"var(--card-bg)",fontSize:13,fontFamily:F,color:"var(--text)",outline:"none" }}/>
         <button onClick={()=>{if(!newNote.text.trim())return;insertNote({id:uid(),...newNote});setNewNote({city_id:cities[0]?.id||"",text:""});}} style={{ padding:"10px 20px",borderRadius:10,border:"none",background:"linear-gradient(135deg,#C45B28,#D4753E)",color:"white",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:F }}>+ Add</button>
       </div>
       <div style={{ display:"grid",gap:12 }}>
-        {cities.map(city=>{const cn=notes.filter(n=>n.city_id===city.id);if(!cn.length)return null;return(
-          <div key={city.id} style={{ background:"#FDFAF6",borderRadius:14,padding:18,border:`1.5px solid ${city.color}20` }}>
+        {cities.map(city=>{const cn=filteredNotes.filter(n=>n.city_id===city.id);if(!cn.length)return null;return(
+          <div key={city.id} style={{ background:"var(--card-bg)",borderRadius:14,padding:18,border:`1.5px solid ${city.color}20` }}>
             <div style={{ display:"flex",alignItems:"center",gap:8,marginBottom:12 }}><span>{city.emoji}</span><span style={{ fontSize:14,fontWeight:700,color:city.color,fontFamily:F }}>{city.name}</span></div>
             {cn.map((note,i)=>(
               <div key={note.id} style={{ display:"flex",alignItems:"flex-start",gap:10,padding:"8px 0",borderTop:i>0?`1px solid ${city.color}10`:"none" }}>
                 <span style={{ width:5,height:5,borderRadius:"50%",background:city.color,marginTop:7,flexShrink:0,opacity:0.4 }}/>
-                <span style={{ flex:1,fontSize:13.5,color:"#4A3728",lineHeight:1.5,fontFamily:F }}>{note.text}</span>
+                <span style={{ flex:1,fontSize:13.5,color:"var(--text-secondary)",lineHeight:1.5,fontFamily:F }}>{note.text}</span>
                 <button onClick={()=>removeNote(note.id)} style={{ background:"none",border:"none",cursor:"pointer",color:"#C4B8A8",fontSize:14,padding:0 }}>×</button>
               </div>
             ))}
@@ -493,19 +534,84 @@ function NotesTab({ cities }) {
   );
 }
 
+// ─── Dark Mode Toggle ───
+function DarkModeToggle({ dark, onToggle }) {
+  return (
+    <button onClick={onToggle} className="no-print" style={{ width:36,height:36,borderRadius:10,border:'1.5px solid var(--border)',background:'var(--card-bg)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:16,flexShrink:0 }} title={dark?'Light mode':'Dark mode'}>
+      {dark ? '☀️' : '🌙'}
+    </button>
+  );
+}
+
+// ─── Print Export ───
+function PrintButton() {
+  return (
+    <button onClick={()=>window.print()} className="no-print" style={{ width:36,height:36,borderRadius:10,border:'1.5px solid var(--border)',background:'var(--card-bg)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:16,flexShrink:0 }} title="Print / Export PDF">
+      🖨️
+    </button>
+  );
+}
+
+// ─── Icons for new tabs ───
+const TransportIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="3" width="15" height="13" rx="2" ry="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>;
+const EatsIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>;
+const MapIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>;
+const PhotoIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>;
+const PhraseIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>;
+const CurrencyIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="6" x2="12" y2="18"/><path d="M15.5 9.5c-.8-1-2-1.5-3.5-1.5s-3 1-3 2.5 1.5 2 3 2.5 3 1 3 2.5-1.5 2.5-3 2.5-2.7-.5-3.5-1.5"/></svg>;
+
 // ─── Main App ───
-const TABS = [{id:"plan",label:"Itinerary",icon:<PlanIcon/>},{id:"pack",label:"Packing",icon:<PackIcon/>},{id:"budget",label:"Budget",icon:<BudgetIcon/>},{id:"notes",label:"Notes",icon:<NotesIcon/>}];
+const TABS = [
+  {id:"plan",label:"Itinerary",icon:<PlanIcon/>},
+  {id:"transport",label:"Transport",icon:<TransportIcon/>},
+  {id:"eats",label:"Eats",icon:<EatsIcon/>},
+  {id:"pack",label:"Packing",icon:<PackIcon/>},
+  {id:"budget",label:"Budget",icon:<BudgetIcon/>},
+  {id:"map",label:"Map",icon:<MapIcon/>},
+  {id:"notes",label:"Notes",icon:<NotesIcon/>},
+  {id:"photos",label:"Photos",icon:<PhotoIcon/>},
+  {id:"currency",label:"Currency",icon:<CurrencyIcon/>},
+  {id:"phrases",label:"Phrases",icon:<PhraseIcon/>},
+];
 
 export default function TripPlanner() {
   const [activeTab,setActiveTab]=useState("plan");
   const [expandedCity,setExpandedCity]=useState(null);
+  const [dark,setDark]=useState(false);
+  const [dragId,setDragId]=useState(null);
 
   const { data:flights, update:updateFlights } = useSingleton('flights');
   const { data:cities, insert:insertCity, update:updateCity, remove:removeCity } = useTable('cities', { orderBy:'sort_order' });
   const stayTable = useTable('stays', { orderBy:'created_at' });
   const dayPlanTable = useTable('day_plans', { orderBy:'sort_order' });
 
+  // Dark mode
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  }, [dark]);
+
   const handleDeleteCity = async (id) => { await removeCity(id); if(expandedCity===id) setExpandedCity(null); };
+
+  // Drag and drop for cities
+  const handleDragStart = (id) => setDragId(id);
+  const handleDragOver = (e) => e.preventDefault();
+  const handleDrop = async (targetId) => {
+    if (!dragId || dragId === targetId) return;
+    const fromIdx = cities.findIndex(c => c.id === dragId);
+    const toIdx = cities.findIndex(c => c.id === targetId);
+    if (fromIdx < 0 || toIdx < 0) return;
+    // Reorder: swap sort_order values
+    const reordered = [...cities];
+    const [moved] = reordered.splice(fromIdx, 1);
+    reordered.splice(toIdx, 0, moved);
+    // Update sort_order for all affected
+    for (let i = 0; i < reordered.length; i++) {
+      if (reordered[i].sort_order !== i) {
+        await updateCity(reordered[i].id, { sort_order: i });
+      }
+    }
+    setDragId(null);
+  };
 
   const warnings = computeWarnings(flights, cities, stayTable.data);
   const tripDays = flights?.depart_date&&flights?.return_date ? getDayCount(flights.depart_date,flights.return_date) : null;
@@ -513,26 +619,48 @@ export default function TripPlanner() {
 
   return (
     <div style={{ minHeight:"100vh" }}>
-      <div style={{ padding:"40px 0 30px",textAlign:"center" }}>
-        <div style={{ fontSize:14,letterSpacing:"0.2em",textTransform:"uppercase",color:"#C45B28",fontWeight:600,marginBottom:8 }}>May 2026</div>
-        <h1 style={{ fontFamily:PF,fontSize:48,fontWeight:800,color:"#2C1810",margin:0,letterSpacing:"-0.02em",lineHeight:1.1 }}>Italy & Beyond</h1>
+      <div style={{ padding:"40px 0 14px",textAlign:"center" }}>
+        {/* Top bar: dark mode + print */}
+        <div className="no-print" style={{ display:'flex',justifyContent:'flex-end',gap:8,padding:'0 24px',marginBottom:12 }}>
+          <PrintButton/>
+          <DarkModeToggle dark={dark} onToggle={()=>setDark(!dark)}/>
+        </div>
+
+        <div style={{ fontSize:14,letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--accent)",fontWeight:600,marginBottom:8 }}>May 2026</div>
+        <h1 style={{ fontFamily:PF,fontSize:48,fontWeight:800,color:"var(--text)",margin:0,letterSpacing:"-0.02em",lineHeight:1.1 }}>Italy & Beyond</h1>
         <div style={{ marginTop:12,display:"flex",justifyContent:"center",gap:6,flexWrap:"wrap" }}>
           {cities.map((city,i)=>(
             <span key={city.id} style={{ display:"flex",alignItems:"center",gap:4 }}>
               <span style={{ fontSize:12,color:city.color,fontWeight:500,padding:"4px 10px",borderRadius:20,background:`${city.color}10`,border:`1px solid ${city.color}20` }}>{city.emoji} {city.name}</span>
-              {i<cities.length-1&&<span style={{ color:"#C4B8A8",fontSize:10 }}>→</span>}
+              {i<cities.length-1&&<span style={{ color:"var(--text-muted)",fontSize:10 }}>→</span>}
             </span>
           ))}
         </div>
+
+        {/* Countdown Timer */}
+        <div style={{ marginTop:16 }}>
+          <CountdownTimer departDate={flights?.depart_date}/>
+        </div>
       </div>
 
-      <div style={{ display:"flex",justifyContent:"center",gap:6,padding:"0 20px",marginBottom:30,position:"sticky",top:0,zIndex:10,background:"linear-gradient(180deg,#F5EDE3 80%,#F5EDE300)",paddingTop:10,paddingBottom:14 }}>
+      {/* Desktop tabs - scrollable */}
+      <div className="desktop-tabs" style={{ display:"flex",justifyContent:"center",gap:4,padding:"0 20px",marginBottom:30,position:"sticky",top:0,zIndex:10,background:`linear-gradient(180deg,var(--bg-solid) 80%,transparent)`,paddingTop:10,paddingBottom:14,overflowX:"auto",WebkitOverflowScrolling:"touch" }}>
         {TABS.map(tab=>(
-          <button key={tab.id} onClick={()=>setActiveTab(tab.id)} style={{ display:"flex",alignItems:"center",gap:7,padding:"10px 20px",borderRadius:12,border:activeTab===tab.id?"1.5px solid #C45B2840":"1.5px solid transparent",background:activeTab===tab.id?"#C45B2812":"transparent",color:activeTab===tab.id?"#C45B28":"#8B7355",fontSize:13.5,fontWeight:600,cursor:"pointer",fontFamily:F,transition:"all 0.25s ease" }}>{tab.icon}{tab.label}</button>
+          <button key={tab.id} onClick={()=>setActiveTab(tab.id)} style={{ display:"flex",alignItems:"center",gap:6,padding:"9px 14px",borderRadius:12,border:activeTab===tab.id?"1.5px solid #C45B2840":"1.5px solid transparent",background:activeTab===tab.id?"#C45B2812":"transparent",color:activeTab===tab.id?"#C45B28":"var(--text-muted)",fontSize:12.5,fontWeight:600,cursor:"pointer",fontFamily:F,transition:"all 0.25s ease",whiteSpace:"nowrap",flexShrink:0 }}>{tab.icon}{tab.label}</button>
         ))}
       </div>
 
-      <div style={{ maxWidth:820,margin:"0 auto",padding:"0 24px 60px" }}>
+      {/* Mobile bottom nav */}
+      <div className="mobile-bottom-nav" style={{ display:"none",position:"fixed",bottom:0,left:0,right:0,zIndex:20,background:"var(--card-bg)",borderTop:"1px solid var(--border)",padding:"6px 4px",justifyContent:"space-around",gap:2,overflowX:"auto" }}>
+        {TABS.map(tab=>(
+          <button key={tab.id} onClick={()=>setActiveTab(tab.id)} style={{ display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"6px 6px",borderRadius:10,border:"none",background:activeTab===tab.id?"#C45B2812":"transparent",color:activeTab===tab.id?"#C45B28":"var(--text-muted)",fontSize:9,fontWeight:600,cursor:"pointer",fontFamily:F,minWidth:0,flexShrink:0 }}>
+            {tab.icon}
+            <span style={{ fontSize:8.5,lineHeight:1 }}>{tab.label}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="main-content" style={{ maxWidth:820,margin:"0 auto",padding:"0 24px 60px" }}>
         {activeTab==="plan"&&(
           <div>
             <FlightBar flights={flights} onUpdate={updateFlights} tripDays={tripDays} totalNights={totalNights}/>
@@ -540,19 +668,28 @@ export default function TripPlanner() {
             <TimelineOverview cities={cities}/>
             <div style={{ display:"grid",gap:14 }}>
               {cities.map(city=>(
-                <CityCard key={city.id} city={city} isExpanded={expandedCity===city.id}
-                  onToggle={()=>setExpandedCity(expandedCity===city.id?null:city.id)}
-                  onUpdate={updateCity} onDelete={handleDeleteCity}
-                  stays={stayTable.data} stayActions={stayTable}
-                  dayPlans={dayPlanTable.data} dayPlanActions={dayPlanTable}/>
+                <div key={city.id} draggable onDragStart={()=>handleDragStart(city.id)} onDragOver={handleDragOver} onDrop={()=>handleDrop(city.id)} onDragEnter={e=>e.currentTarget.classList.add('drag-over')} onDragLeave={e=>e.currentTarget.classList.remove('drag-over')}>
+                  <WeatherBadge cityId={city.id}/>
+                  <CityCard city={city} isExpanded={expandedCity===city.id}
+                    onToggle={()=>setExpandedCity(expandedCity===city.id?null:city.id)}
+                    onUpdate={updateCity} onDelete={handleDeleteCity}
+                    stays={stayTable.data} stayActions={stayTable}
+                    dayPlans={dayPlanTable.data} dayPlanActions={dayPlanTable}/>
+                </div>
               ))}
               <AddCityCard onAdd={insertCity}/>
             </div>
           </div>
         )}
+        {activeTab==="transport"&&<TransportPlanner cities={cities}/>}
+        {activeTab==="eats"&&<RestaurantBookmarks cities={cities}/>}
         {activeTab==="pack"&&<PackingList/>}
         {activeTab==="budget"&&<BudgetTracker cities={cities} stays={stayTable.data}/>}
+        {activeTab==="map"&&<MapView cities={cities} flights={flights}/>}
         {activeTab==="notes"&&<NotesTab cities={cities}/>}
+        {activeTab==="photos"&&<PhotoJournal cities={cities}/>}
+        {activeTab==="currency"&&<CurrencyConverter/>}
+        {activeTab==="phrases"&&<PhraseBook/>}
       </div>
     </div>
   );
