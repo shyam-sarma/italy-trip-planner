@@ -1,11 +1,77 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* CSS Variables for theming */
+:root {
+  --bg: linear-gradient(180deg, #F5EDE3 0%, #FDF8F2 30%, #F5EDE3 100%);
+  --bg-solid: #F5EDE3;
+  --card-bg: #FDFAF6;
+  --subtle-bg: #F5EDE308;
+  --text: #2C1810;
+  --text-secondary: #4A3728;
+  --text-muted: #8B7355;
+  --border: #E8E0D4;
+  --border-light: #E8E0D410;
+  --accent: #C45B28;
+  --map-water: #E8F4FD;
+  --map-land: #E8E0D4;
+  --map-italy: #F5EDE3;
+  --map-border: #D4C8B8;
+}
+
+[data-theme="dark"] {
+  --bg: linear-gradient(180deg, #1a1512 0%, #231e19 30%, #1a1512 100%);
+  --bg-solid: #1a1512;
+  --card-bg: #2a2320;
+  --subtle-bg: #332b2608;
+  --text: #E8E0D4;
+  --text-secondary: #C4B8A8;
+  --text-muted: #8B7D6B;
+  --border: #3d3530;
+  --border-light: #3d353010;
+  --accent: #E8A87C;
+  --map-water: #1a2530;
+  --map-land: #3d3530;
+  --map-italy: #2a2320;
+  --map-border: #5a4f45;
+}
+
 body {
   font-family: 'DM Sans', sans-serif;
-  background: linear-gradient(180deg, #F5EDE3 0%, #FDF8F2 30%, #F5EDE3 100%);
+  background: var(--bg);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  color: var(--text);
+  transition: background 0.3s ease, color 0.3s ease;
 }
 ::selection { background: #C45B2830; }
-input::placeholder, textarea::placeholder { color: #B0A090; }
+input::placeholder, textarea::placeholder { color: var(--text-muted); }
 input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; }
+select { color: var(--text); background: var(--card-bg); }
+
 @keyframes fadeSlide { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Mobile bottom nav */
+@media (max-width: 640px) {
+  .desktop-tabs { display: none !important; }
+  .mobile-bottom-nav { display: flex !important; }
+  .main-content { padding-bottom: 80px !important; }
+}
+@media (min-width: 641px) {
+  .mobile-bottom-nav { display: none !important; }
+}
+
+/* Print styles */
+@media print {
+  body { background: white !important; }
+  .no-print, .mobile-bottom-nav, .desktop-tabs { display: none !important; }
+  .main-content { padding-bottom: 0 !important; }
+  * { color: #000 !important; border-color: #ccc !important; background: white !important; }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Drag styles */
+.drag-over { outline: 2px dashed #C45B28 !important; outline-offset: -2px; }
