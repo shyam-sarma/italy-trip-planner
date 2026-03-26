@@ -9,6 +9,7 @@ import RestaurantBookmarks from './RestaurantBookmarks';
 import MapView from './MapView';
 import PhotoJournal from './PhotoJournal';
 import PhraseBook from './PhraseBook';
+import ImportVault from './ImportVault';
 
 // ─── Constants ───
 const COLOR_PRESETS = [
@@ -559,6 +560,7 @@ const MapIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none
 const PhotoIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>;
 const PhraseIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>;
 const CurrencyIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="6" x2="12" y2="18"/><path d="M15.5 9.5c-.8-1-2-1.5-3.5-1.5s-3 1-3 2.5 1.5 2 3 2.5 3 1 3 2.5-1.5 2.5-3 2.5-2.7-.5-3.5-1.5"/></svg>;
+const ImportIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>;
 
 // ─── Main App ───
 const TABS = [
@@ -572,6 +574,7 @@ const TABS = [
   {id:"photos",label:"Photos",icon:<PhotoIcon/>},
   {id:"currency",label:"Currency",icon:<CurrencyIcon/>},
   {id:"phrases",label:"Phrases",icon:<PhraseIcon/>},
+  {id:"import",label:"Imports",icon:<ImportIcon/>},
 ];
 
 export default function TripPlanner() {
@@ -690,6 +693,7 @@ export default function TripPlanner() {
         {activeTab==="photos"&&<PhotoJournal cities={cities}/>}
         {activeTab==="currency"&&<CurrencyConverter/>}
         {activeTab==="phrases"&&<PhraseBook/>}
+        {activeTab==="import"&&<ImportVault cities={cities} stayActions={stayTable} flights={flights} updateFlights={updateFlights}/>}
       </div>
     </div>
   );
