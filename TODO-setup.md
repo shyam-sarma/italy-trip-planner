@@ -41,17 +41,6 @@ This creates 3 new tables needed for:
 This creates the `documents` table needed for:
 - **Imports** tab (AI booking parser + document vault)
 
-## Step 4b: Run Supabase Migration V4 (Flight Legs)
-1. Still in Supabase **SQL Editor** → **New Query**
-2. Open the file `supabase-migration-v4.sql` from the repo
-3. Copy ALL of it, paste into the editor
-4. Click **Run**
-5. You should see "Success"
-
-This creates the `flight_legs` table needed for:
-- Multi-leg flight display (boarding pass style)
-- Flight edit modal
-
 ## Step 5: Get an Anthropic API Key (for AI Booking Parser)
 1. Go to https://console.anthropic.com
 2. Sign up or log in

@@ -10,8 +10,6 @@ import MapView from './MapView';
 import PhotoJournal from './PhotoJournal';
 import PhraseBook from './PhraseBook';
 import ImportVault from './ImportVault';
-import FlightCard from './FlightCard';
-import FlightEditModal from './FlightEditModal';
 
 // ─── Constants ───
 const COLOR_PRESETS = [
@@ -91,7 +89,41 @@ function computeWarnings(flights, cities, stays) {
   return w;
 }
 
-// FlightBar removed — replaced by FlightCard component
+// ─── Flight Bar ───
+function FlightBar({ flights, onUpdate, tripDays, totalNights }) {
+  if (!flights) return null;
+  const debounceUpdate = (field, val) => onUpdate({ [field]: val });
+  return (
+    <div style={{ background:"var(--card-bg)",borderRadius:14,border:"1px solid var(--border)",padding:"16px 20px",marginBottom:20 }}>
+      <div style={{ display:"flex",alignItems:"center",gap:8,marginBottom:14 }}>
+        <span style={{ fontSize:15 }}>✈️</span>
+        <span style={{ fontSize:13,fontWeight:700,color:"var(--text)",fontFamily:F }}>Flight Bookends</span>
+        {tripDays!==null&&tripDays>0&&(
+          <span style={{ marginLeft:"auto",fontSize:12,fontWeight:600,color:"#C45B28",padding:"3px 10px",borderRadius:8,background:"#C45B2812",fontFamily:F }}>
+            {tripDays} day trip{totalNights>0?` · ${totalNights} night${totalNights>1?"s":""} planned`:""}
+          </span>
+        )}
+      </div>
+      <div className="flight-sections" style={{ display:"flex",gap:20,flexWrap:"wrap" }}>
+        <div style={{ flex:1,minWidth:240,padding:"12px 14px",background:"var(--subtle-bg)",borderRadius:10,border:"1px solid var(--border)" }}>
+          <div style={{ fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",color:"#C45B28",marginBottom:8,fontFamily:F }}>🇨🇦 Toronto Departure</div>
+          <div style={{ display:"flex",gap:10 }}>
+            <input type="date" defaultValue={flights.depart_date} onBlur={e=>debounceUpdate('depart_date',e.target.value)} style={{...inputSt,flex:1}} />
+            <input type="time" defaultValue={flights.depart_time} onBlur={e=>debounceUpdate('depart_time',e.target.value)} style={{...inputSt,flex:1}} />
+          </div>
+        </div>
+        <div className="flight-arrow" style={{ display:"flex",alignItems:"center",color:"var(--border)",fontSize:18 }}>→</div>
+        <div style={{ flex:1,minWidth:240,padding:"12px 14px",background:"var(--subtle-bg)",borderRadius:10,border:"1px solid var(--border)" }}>
+          <div style={{ fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",color:"#2C3E50",marginBottom:8,fontFamily:F }}>🇬🇧 Return Flight</div>
+          <div style={{ display:"flex",gap:10 }}>
+            <input type="date" defaultValue={flights.return_date} onBlur={e=>debounceUpdate('return_date',e.target.value)} style={{...inputSt,flex:1}} />
+            <input type="time" defaultValue={flights.return_time} onBlur={e=>debounceUpdate('return_time',e.target.value)} style={{...inputSt,flex:1}} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ─── Warnings ───
 function WarningsPanel({ warnings }) {
@@ -582,13 +614,11 @@ export default function TripPlanner() {
   const [dark,setDark]=useState(false);
   const [dragId,setDragId]=useState(null);
   const [moreOpen,setMoreOpen]=useState(false);
-  const [flightEditOpen,setFlightEditOpen]=useState(false);
 
   const { data:flights, update:updateFlights } = useSingleton('flights');
   const { data:cities, insert:insertCity, update:updateCity, remove:removeCity } = useTable('cities', { orderBy:'sort_order' });
   const stayTable = useTable('stays', { orderBy:'created_at' });
   const dayPlanTable = useTable('day_plans', { orderBy:'sort_order' });
-  const flightLegsTable = useTable('flight_legs', { orderBy:'leg_order' });
 
   // Dark mode
   useEffect(() => {
@@ -689,7 +719,7 @@ export default function TripPlanner() {
       <div className="main-content" style={{ maxWidth:820,margin:"0 auto",padding:"0 24px 60px" }}>
         {activeTab==="plan"&&(
           <div>
-            <FlightCard flights={flights} onUpdate={updateFlights} flightLegs={flightLegsTable.data} flightLegsActions={flightLegsTable} tripDays={tripDays} totalNights={totalNights} onEditOpen={()=>setFlightEditOpen(true)}/>
+            <FlightBar flights={flights} onUpdate={updateFlights} tripDays={tripDays} totalNights={totalNights}/>
             <WarningsPanel warnings={warnings}/>
             <TimelineOverview cities={cities}/>
             <div style={{ display:"grid",gap:14 }}>
@@ -719,8 +749,6 @@ export default function TripPlanner() {
         {activeTab==="import"&&<ImportVault cities={cities} stayActions={stayTable} flights={flights} updateFlights={updateFlights}/>}
       </div>
 
-      {/* Flight Edit Modal */}
-      {flightEditOpen&&<FlightEditModal flightLegs={flightLegsTable.data} flightLegsActions={flightLegsTable} updateFlights={updateFlights} onClose={()=>setFlightEditOpen(false)}/>}
     </div>
   );
 }
