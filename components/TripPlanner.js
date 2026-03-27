@@ -104,20 +104,20 @@ function FlightBar({ flights, onUpdate, tripDays, totalNights }) {
           </span>
         )}
       </div>
-      <div style={{ display:"flex",gap:20,flexWrap:"wrap" }}>
+      <div className="flight-sections" style={{ display:"flex",gap:20,flexWrap:"wrap" }}>
         <div style={{ flex:1,minWidth:240,padding:"12px 14px",background:"#F5EDE308",borderRadius:10,border:"1px solid #E8E0D4" }}>
           <div style={{ fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",color:"#C45B28",marginBottom:8,fontFamily:F }}>🇨🇦 Toronto Departure</div>
           <div style={{ display:"flex",gap:10 }}>
-            <input type="date" defaultValue={flights.depart_date} onBlur={e=>debounceUpdate('depart_date',e.target.value)} style={{...inputSt,width:135}} />
-            <input type="time" defaultValue={flights.depart_time} onBlur={e=>debounceUpdate('depart_time',e.target.value)} style={{...inputSt,width:100}} />
+            <input type="date" defaultValue={flights.depart_date} onBlur={e=>debounceUpdate('depart_date',e.target.value)} style={{...inputSt,flex:1}} />
+            <input type="time" defaultValue={flights.depart_time} onBlur={e=>debounceUpdate('depart_time',e.target.value)} style={{...inputSt,flex:1}} />
           </div>
         </div>
-        <div style={{ display:"flex",alignItems:"center",color:"#D4C8B8",fontSize:18 }}>→</div>
+        <div className="flight-arrow" style={{ display:"flex",alignItems:"center",color:"#D4C8B8",fontSize:18 }}>→</div>
         <div style={{ flex:1,minWidth:240,padding:"12px 14px",background:"#F5EDE308",borderRadius:10,border:"1px solid #E8E0D4" }}>
           <div style={{ fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",color:"#2C3E50",marginBottom:8,fontFamily:F }}>🇬🇧 Return Flight</div>
           <div style={{ display:"flex",gap:10 }}>
-            <input type="date" defaultValue={flights.return_date} onBlur={e=>debounceUpdate('return_date',e.target.value)} style={{...inputSt,width:135}} />
-            <input type="time" defaultValue={flights.return_time} onBlur={e=>debounceUpdate('return_time',e.target.value)} style={{...inputSt,width:100}} />
+            <input type="date" defaultValue={flights.return_date} onBlur={e=>debounceUpdate('return_date',e.target.value)} style={{...inputSt,flex:1}} />
+            <input type="time" defaultValue={flights.return_time} onBlur={e=>debounceUpdate('return_time',e.target.value)} style={{...inputSt,flex:1}} />
           </div>
         </div>
       </div>
@@ -577,11 +577,17 @@ const TABS = [
   {id:"import",label:"Imports",icon:<ImportIcon/>},
 ];
 
+// Mobile: 4 primary tabs + "More" button
+const MOBILE_PRIMARY = ["plan","transport","budget","import"];
+const MOBILE_MORE = TABS.filter(t=>!MOBILE_PRIMARY.includes(t.id));
+const MoreIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>;
+
 export default function TripPlanner() {
   const [activeTab,setActiveTab]=useState("plan");
   const [expandedCity,setExpandedCity]=useState(null);
   const [dark,setDark]=useState(false);
   const [dragId,setDragId]=useState(null);
+  const [moreOpen,setMoreOpen]=useState(false);
 
   const { data:flights, update:updateFlights } = useSingleton('flights');
   const { data:cities, insert:insertCity, update:updateCity, remove:removeCity } = useTable('cities', { orderBy:'sort_order' });
@@ -622,7 +628,7 @@ export default function TripPlanner() {
 
   return (
     <div style={{ minHeight:"100vh" }}>
-      <div style={{ padding:"40px 0 14px",textAlign:"center" }}>
+      <div className="app-header" style={{ padding:"40px 0 14px",textAlign:"center" }}>
         {/* Top bar: dark mode + print */}
         <div className="no-print" style={{ display:'flex',justifyContent:'flex-end',gap:8,padding:'0 24px',marginBottom:12 }}>
           <PrintButton/>
@@ -630,7 +636,7 @@ export default function TripPlanner() {
         </div>
 
         <div style={{ fontSize:14,letterSpacing:"0.2em",textTransform:"uppercase",color:"var(--accent)",fontWeight:600,marginBottom:8 }}>May 2026</div>
-        <h1 style={{ fontFamily:PF,fontSize:48,fontWeight:800,color:"var(--text)",margin:0,letterSpacing:"-0.02em",lineHeight:1.1 }}>Italy & Beyond</h1>
+        <h1 className="app-title" style={{ fontFamily:PF,fontSize:48,fontWeight:800,color:"var(--text)",margin:0,letterSpacing:"-0.02em",lineHeight:1.1 }}>Italy & Beyond</h1>
         <div style={{ marginTop:12,display:"flex",justifyContent:"center",gap:6,flexWrap:"wrap" }}>
           {cities.map((city,i)=>(
             <span key={city.id} style={{ display:"flex",alignItems:"center",gap:4 }}>
@@ -653,15 +659,36 @@ export default function TripPlanner() {
         ))}
       </div>
 
-      {/* Mobile bottom nav */}
-      <div className="mobile-bottom-nav" style={{ display:"none",position:"fixed",bottom:0,left:0,right:0,zIndex:20,background:"var(--card-bg)",borderTop:"1px solid var(--border)",padding:"6px 4px",justifyContent:"space-around",gap:2,overflowX:"auto" }}>
-        {TABS.map(tab=>(
-          <button key={tab.id} onClick={()=>setActiveTab(tab.id)} style={{ display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"6px 6px",borderRadius:10,border:"none",background:activeTab===tab.id?"#C45B2812":"transparent",color:activeTab===tab.id?"#C45B28":"var(--text-muted)",fontSize:9,fontWeight:600,cursor:"pointer",fontFamily:F,minWidth:0,flexShrink:0 }}>
+      {/* Mobile bottom nav — 4 primary tabs + More */}
+      <div className="mobile-bottom-nav" style={{ display:"none",position:"fixed",bottom:0,left:0,right:0,zIndex:20,background:"var(--card-bg)",borderTop:"1px solid var(--border)",padding:"6px 0 env(safe-area-inset-bottom, 6px)",justifyContent:"space-around" }}>
+        {MOBILE_PRIMARY.map(id=>{const tab=TABS.find(t=>t.id===id);return(
+          <button key={id} onClick={()=>{setActiveTab(id);setMoreOpen(false);}} style={{ display:"flex",flexDirection:"column",alignItems:"center",gap:3,padding:"6px 12px",borderRadius:10,border:"none",background:activeTab===id?"#C45B2812":"transparent",color:activeTab===id?"#C45B28":"var(--text-muted)",fontSize:10,fontWeight:600,cursor:"pointer",fontFamily:F }}>
             {tab.icon}
-            <span style={{ fontSize:8.5,lineHeight:1 }}>{tab.label}</span>
+            <span style={{ fontSize:10,lineHeight:1 }}>{tab.label}</span>
           </button>
-        ))}
+        );})}
+        <button onClick={()=>setMoreOpen(!moreOpen)} style={{ display:"flex",flexDirection:"column",alignItems:"center",gap:3,padding:"6px 12px",borderRadius:10,border:"none",background:moreOpen||(!MOBILE_PRIMARY.includes(activeTab))?"#C45B2812":"transparent",color:moreOpen||(!MOBILE_PRIMARY.includes(activeTab))?"#C45B28":"var(--text-muted)",fontSize:10,fontWeight:600,cursor:"pointer",fontFamily:F }}>
+          <MoreIcon/>
+          <span style={{ fontSize:10,lineHeight:1 }}>More</span>
+        </button>
       </div>
+
+      {/* More menu overlay */}
+      {moreOpen&&(
+        <>
+          <div className="more-menu-overlay" onClick={()=>setMoreOpen(false)}/>
+          <div className="more-menu">
+            <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8 }}>
+              {MOBILE_MORE.map(tab=>(
+                <button key={tab.id} onClick={()=>{setActiveTab(tab.id);setMoreOpen(false);}} style={{ display:"flex",flexDirection:"column",alignItems:"center",gap:6,padding:"14px 8px",borderRadius:12,border:activeTab===tab.id?"1.5px solid #C45B28":"1.5px solid var(--border)",background:activeTab===tab.id?"#C45B2812":"transparent",color:activeTab===tab.id?"#C45B28":"var(--text-muted)",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:F }}>
+                  {tab.icon}
+                  <span>{tab.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
 
       <div className="main-content" style={{ maxWidth:820,margin:"0 auto",padding:"0 24px 60px" }}>
         {activeTab==="plan"&&(
