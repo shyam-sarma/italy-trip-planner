@@ -49,15 +49,35 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: po
 select { color: var(--text); background: var(--card-bg); }
 
 @keyframes fadeSlide { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* Mobile bottom nav */
 @media (max-width: 640px) {
   .desktop-tabs { display: none !important; }
   .mobile-bottom-nav { display: flex !important; }
-  .main-content { padding-bottom: 80px !important; }
+  .main-content { padding: 0 16px 80px !important; }
+
+  /* Compact countdown on mobile */
+  .cd-label { font-size: 9px !important; margin-bottom: 6px !important; }
+  .cd-num { font-size: 22px !important; }
+
+  /* FlightBar: stack vertically, hide arrow */
+  .flight-sections { flex-direction: column !important; gap: 10px !important; }
+  .flight-sections > div { min-width: unset !important; }
+  .flight-arrow { display: none !important; }
+
+  /* Compact header */
+  .app-title { font-size: 36px !important; }
+  .app-header { padding: 28px 0 10px !important; }
+
+  /* More menu overlay */
+  .more-menu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 25; animation: fadeIn 0.15s ease; }
+  .more-menu { position: fixed; bottom: 60px; left: 8px; right: 8px; z-index: 30; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); padding: 16px; box-shadow: 0 -4px 20px rgba(0,0,0,0.12); animation: slideUp 0.2s ease; }
 }
 @media (min-width: 641px) {
   .mobile-bottom-nav { display: none !important; }
+  .more-menu-overlay, .more-menu { display: none !important; }
 }
 
 /* Print styles */
