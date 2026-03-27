@@ -10,6 +10,8 @@ import MapView from './MapView';
 import PhotoJournal from './PhotoJournal';
 import PhraseBook from './PhraseBook';
 import ImportVault from './ImportVault';
+import FlightCard from './FlightCard';
+import FlightEditModal from './FlightEditModal';
 
 // ─── Constants ───
 const COLOR_PRESETS = [
@@ -89,54 +91,46 @@ function computeWarnings(flights, cities, stays) {
   return w;
 }
 
-// ─── Flight Bar ───
-function FlightBar({ flights, onUpdate, tripDays, totalNights }) {
-  if (!flights) return null;
-  const debounceUpdate = (field, val) => onUpdate({ [field]: val });
-  return (
-    <div style={{ background:"#FDFAF6",borderRadius:14,border:"1px solid #E8E0D4",padding:"16px 20px",marginBottom:20 }}>
-      <div style={{ display:"flex",alignItems:"center",gap:8,marginBottom:14 }}>
-        <span style={{ fontSize:15 }}>✈️</span>
-        <span style={{ fontSize:13,fontWeight:700,color:"#2C1810",fontFamily:F }}>Flight Bookends</span>
-        {tripDays!==null&&tripDays>0&&(
-          <span style={{ marginLeft:"auto",fontSize:12,fontWeight:600,color:"#C45B28",padding:"3px 10px",borderRadius:8,background:"#C45B2812",fontFamily:F }}>
-            {tripDays} day trip{totalNights>0?` · ${totalNights} night${totalNights>1?"s":""} planned`:""}
-          </span>
-        )}
-      </div>
-      <div className="flight-sections" style={{ display:"flex",gap:20,flexWrap:"wrap" }}>
-        <div style={{ flex:1,minWidth:240,padding:"12px 14px",background:"#F5EDE308",borderRadius:10,border:"1px solid #E8E0D4" }}>
-          <div style={{ fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",color:"#C45B28",marginBottom:8,fontFamily:F }}>🇨🇦 Toronto Departure</div>
-          <div style={{ display:"flex",gap:10 }}>
-            <input type="date" defaultValue={flights.depart_date} onBlur={e=>debounceUpdate('depart_date',e.target.value)} style={{...inputSt,flex:1}} />
-            <input type="time" defaultValue={flights.depart_time} onBlur={e=>debounceUpdate('depart_time',e.target.value)} style={{...inputSt,flex:1}} />
-          </div>
-        </div>
-        <div className="flight-arrow" style={{ display:"flex",alignItems:"center",color:"#D4C8B8",fontSize:18 }}>→</div>
-        <div style={{ flex:1,minWidth:240,padding:"12px 14px",background:"#F5EDE308",borderRadius:10,border:"1px solid #E8E0D4" }}>
-          <div style={{ fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",color:"#2C3E50",marginBottom:8,fontFamily:F }}>🇬🇧 Return Flight</div>
-          <div style={{ display:"flex",gap:10 }}>
-            <input type="date" defaultValue={flights.return_date} onBlur={e=>debounceUpdate('return_date',e.target.value)} style={{...inputSt,flex:1}} />
-            <input type="time" defaultValue={flights.return_time} onBlur={e=>debounceUpdate('return_time',e.target.value)} style={{...inputSt,flex:1}} />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+// FlightBar removed — replaced by FlightCard component
 
 // ─── Warnings ───
 function WarningsPanel({ warnings }) {
+  const [open, setOpen] = useState(false);
+  const [dismissed, setDismissed] = useState([]);
+
   if(!warnings.length) return null;
-  const colors = { error:{bg:"#FDEDEC",border:"#E74C3C30",text:"#C0392B",icon:<WarnIcon/>}, warn:{bg:"#FEF9E7",border:"#F1C40F30",text:"#B7950B",icon:<WarnIcon/>}, info:{bg:"#EBF5FB",border:"#3498DB30",text:"#2874A6",icon:<InfoIcon/>} };
+
+  const visible = warnings.filter((_,i) => !dismissed.includes(i));
+  if(!visible.length) return null;
+
+  const colors = { error:{bg:"#FDEDEC",border:"#E74C3C30",text:"#C0392B",icon:<WarnIcon/>,dot:"#E74C3C"}, warn:{bg:"#FEF9E7",border:"#F1C40F30",text:"#B7950B",icon:<WarnIcon/>,dot:"#F1C40F"}, info:{bg:"#EBF5FB",border:"#3498DB30",text:"#2874A6",icon:<InfoIcon/>,dot:"#3498DB"} };
+
+  const counts = {};
+  visible.forEach(w => { counts[w.type] = (counts[w.type] || 0) + 1; });
+  const labels = { error:'error', warn:'warning', info:'info' };
+
   return (
-    <div style={{ display:"grid",gap:8,marginBottom:20 }}>
-      {warnings.map((w,i)=>{ const s=colors[w.type]||colors.info; return (
-        <div key={i} style={{ display:"flex",alignItems:"flex-start",gap:10,padding:"10px 14px",borderRadius:10,background:s.bg,border:`1px solid ${s.border}`,animation:"fadeSlide 0.3s ease" }}>
-          <span style={{ color:s.text,marginTop:1,flexShrink:0 }}>{s.icon}</span>
-          <span style={{ fontSize:12.5,color:s.text,fontFamily:F,lineHeight:1.5 }}>{w.msg}</span>
+    <div style={{ marginBottom:20 }}>
+      <div onClick={() => setOpen(!open)} style={{ display:"flex",alignItems:"center",gap:10,padding:"10px 14px",borderRadius:10,background:"var(--card-bg)",border:"1px solid var(--border)",cursor:"pointer",userSelect:"none" }}>
+        {Object.entries(counts).map(([type,count]) => (
+          <span key={type} style={{ display:"flex",alignItems:"center",gap:5,fontSize:12.5,fontWeight:600,color:colors[type]?.text||"var(--text-muted)",fontFamily:F }}>
+            <span style={{ width:8,height:8,borderRadius:"50%",background:colors[type]?.dot||"#999" }}/>
+            {count} {labels[type]||type}{count>1?'s':''}
+          </span>
+        ))}
+        <span style={{ marginLeft:"auto",transform:open?"rotate(180deg)":"rotate(0)",transition:"transform 0.2s",color:"var(--text-muted)",fontSize:14 }}>▾</span>
+      </div>
+      {open && (
+        <div style={{ display:"grid",gap:8,marginTop:8,animation:"fadeSlide 0.2s ease" }}>
+          {warnings.map((w,i)=>{ if(dismissed.includes(i)) return null; const s=colors[w.type]||colors.info; return (
+            <div key={i} style={{ display:"flex",alignItems:"flex-start",gap:10,padding:"10px 14px",borderRadius:10,background:s.bg,border:`1px solid ${s.border}` }}>
+              <span style={{ color:s.text,marginTop:1,flexShrink:0 }}>{s.icon}</span>
+              <span style={{ flex:1,fontSize:12.5,color:s.text,fontFamily:F,lineHeight:1.5 }}>{w.msg}</span>
+              <button onClick={e => { e.stopPropagation(); setDismissed(d => [...d, i]); }} style={{ background:"none",border:"none",cursor:"pointer",color:s.text,opacity:0.5,fontSize:14,padding:"0 2px",flexShrink:0 }}>×</button>
+            </div>
+          );})}
         </div>
-      );})}
+      )}
     </div>
   );
 }
@@ -588,11 +582,13 @@ export default function TripPlanner() {
   const [dark,setDark]=useState(false);
   const [dragId,setDragId]=useState(null);
   const [moreOpen,setMoreOpen]=useState(false);
+  const [flightEditOpen,setFlightEditOpen]=useState(false);
 
   const { data:flights, update:updateFlights } = useSingleton('flights');
   const { data:cities, insert:insertCity, update:updateCity, remove:removeCity } = useTable('cities', { orderBy:'sort_order' });
   const stayTable = useTable('stays', { orderBy:'created_at' });
   const dayPlanTable = useTable('day_plans', { orderBy:'sort_order' });
+  const flightLegsTable = useTable('flight_legs', { orderBy:'leg_order' });
 
   // Dark mode
   useEffect(() => {
@@ -693,7 +689,7 @@ export default function TripPlanner() {
       <div className="main-content" style={{ maxWidth:820,margin:"0 auto",padding:"0 24px 60px" }}>
         {activeTab==="plan"&&(
           <div>
-            <FlightBar flights={flights} onUpdate={updateFlights} tripDays={tripDays} totalNights={totalNights}/>
+            <FlightCard flights={flights} onUpdate={updateFlights} flightLegs={flightLegsTable.data} flightLegsActions={flightLegsTable} tripDays={tripDays} totalNights={totalNights} onEditOpen={()=>setFlightEditOpen(true)}/>
             <WarningsPanel warnings={warnings}/>
             <TimelineOverview cities={cities}/>
             <div style={{ display:"grid",gap:14 }}>
@@ -722,6 +718,9 @@ export default function TripPlanner() {
         {activeTab==="phrases"&&<PhraseBook/>}
         {activeTab==="import"&&<ImportVault cities={cities} stayActions={stayTable} flights={flights} updateFlights={updateFlights}/>}
       </div>
+
+      {/* Flight Edit Modal */}
+      {flightEditOpen&&<FlightEditModal flightLegs={flightLegsTable.data} flightLegsActions={flightLegsTable} updateFlights={updateFlights} onClose={()=>setFlightEditOpen(false)}/>}
     </div>
   );
 }
