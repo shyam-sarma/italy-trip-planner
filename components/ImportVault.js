@@ -37,7 +37,6 @@ function matchCity(name, cities) {
 // ─── AI Parser Section ───
 function BookingParser({ cities, stayActions, flights, updateFlights }) {
   const transportTable = useTable('transports', { orderBy: 'sort_order' });
-  const flightLegsTable = useTable('flight_legs', { orderBy: 'leg_order' });
   const docTable = useTable('documents', { orderBy: 'created_at' });
 
   const [text, setText] = useState('');
@@ -155,20 +154,12 @@ function BookingParser({ cities, stayActions, flights, updateFlights }) {
       const d = r.data || {};
 
       if (r.type === 'flight') {
-        // Update singleton for backward compat
         const updates = {};
         if (d.depart_date) updates.depart_date = d.depart_date;
         if (d.depart_time) updates.depart_time = d.depart_time;
         if (d.return_date) updates.return_date = d.return_date;
         if (d.return_time) updates.return_time = d.return_time;
         if (Object.keys(updates).length > 0) await updateFlights(updates);
-
-        // Insert flight legs if parsed
-        if (d.legs && Array.isArray(d.legs)) {
-          for (const leg of d.legs) {
-            await flightLegsTable.insert({ id: uid(), ...leg });
-          }
-        }
       }
 
       if (r.type === 'hotel') {
