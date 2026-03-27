@@ -4,7 +4,8 @@ const SYSTEM_PROMPT = `You are a booking confirmation parser. Extract structured
 
 Determine the booking type and return one of these formats:
 
-FLIGHT: { "type": "flight", "data": { "depart_date": "YYYY-MM-DD", "depart_time": "HH:MM", "return_date": "YYYY-MM-DD or null", "return_time": "HH:MM or null" }}
+FLIGHT: { "type": "flight", "data": { "depart_date": "YYYY-MM-DD", "depart_time": "HH:MM", "return_date": "YYYY-MM-DD or null", "return_time": "HH:MM or null", "legs": [{ "direction": "outbound or return", "leg_order": 0, "origin_code": "YYZ", "origin_city": "Toronto", "dest_code": "FCO", "dest_city": "Rome", "airline": "Air Transat", "flight_number": "TS 551", "aircraft": "A321LR", "depart_date": "YYYY-MM-DD", "depart_time": "HH:MM", "arrive_date": "YYYY-MM-DD", "arrive_time": "HH:MM", "duration": "1h20m", "class": "Economy", "confirm_num": "ABC123" }] }}
+For flights, depart_date/depart_time should be the first outbound leg departure, return_date/return_time should be the last return leg arrival. Include ALL legs in the legs array.
 
 HOTEL/ACCOMMODATION: { "type": "hotel", "data": { "name": "hotel name", "address": "full address", "checkin": "YYYY-MM-DD", "checkin_time": "HH:MM", "checkout": "YYYY-MM-DD", "checkout_time": "HH:MM", "confirm_num": "confirmation number", "cost": 0, "currency": "EUR/GBP/CAD/USD", "notes": "any extra details like breakfast included", "city_name": "city name" }}
 
