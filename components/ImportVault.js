@@ -43,6 +43,8 @@ function BookingParser({ cities, stayActions, flights, updateFlights }) {
   const [imageData, setImageData] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [mediaType, setMediaType] = useState(null);
+  const [pdfData, setPdfData] = useState(null);
+  const [fileName, setFileName] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [results, setResults] = useState(null);
@@ -53,11 +55,41 @@ function BookingParser({ cities, stayActions, flights, updateFlights }) {
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { setError('File too large. Max 5MB.'); return; }
+    if (file.size > 10 * 1024 * 1024) { setError('File too large. Max 10MB.'); return; }
+    setFileName(file.name);
+
+    // Text files: read as text and populate the text area
+    if (file.type === 'text/plain' || file.type === 'text/csv' || file.name.endsWith('.txt') || file.name.endsWith('.csv')) {
+      const reader = new FileReader();
+      reader.onload = () => { setText(prev => prev ? prev + '\n\n' + reader.result : reader.result); };
+      reader.readAsText(file);
+      return;
+    }
+
+    // PDFs: read as base64 and send via Files API
+    if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result;
+        const match = dataUrl.match(/^data:(.*?);base64,(.*)$/);
+        if (match) {
+          setPdfData(match[2]);
+          setImagePreview(null);
+          setImageData(null);
+          setMediaType(null);
+        }
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+
+    // Images: existing base64 flow
     const reader = new FileReader();
     reader.onload = () => {
       const dataUrl = reader.result;
       setImagePreview(dataUrl);
+      setPdfData(null);
+      setFileName(null);
       const match = dataUrl.match(/^data:(.*?);base64,(.*)$/);
       if (match) {
         setMediaType(match[1]);
@@ -68,7 +100,7 @@ function BookingParser({ cities, stayActions, flights, updateFlights }) {
   };
 
   const handleParse = async () => {
-    if (!text.trim() && !imageData) return;
+    if (!text.trim() && !imageData && !pdfData) return;
     setLoading(true);
     setError(null);
     setResults(null);
@@ -82,6 +114,8 @@ function BookingParser({ cities, stayActions, flights, updateFlights }) {
           text: text.trim() || undefined,
           image: imageData || undefined,
           mediaType: mediaType || undefined,
+          pdf: pdfData || undefined,
+          fileName: fileName || undefined,
         }),
       });
       const json = await res.json();
@@ -184,6 +218,8 @@ function BookingParser({ cities, stayActions, flights, updateFlights }) {
     setImageData(null);
     setImagePreview(null);
     setMediaType(null);
+    setPdfData(null);
+    setFileName(null);
     setResults(null);
     setError(null);
     setCityOverrides({});
@@ -287,19 +323,26 @@ function BookingParser({ cities, stayActions, flights, updateFlights }) {
           <textarea
             value={text}
             onChange={e => setText(e.target.value)}
-            placeholder={"Paste your booking confirmation here...\n\nExamples:\n• Flight confirmation email\n• Hotel reservation details\n• Train/bus ticket\n• Airbnb booking"}
+            placeholder={"Paste your booking confirmation here...\n\nExamples:\n• Flight confirmation email\n• Hotel reservation details\n• Train/bus ticket\n• Airbnb booking\n\nOr upload a PDF, screenshot, or text file using the button below."}
             style={{ ...inputSt, minHeight: 140, resize: 'vertical', fontFamily: F, lineHeight: 1.6 }}
           />
 
           <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 12 }}>
-            <input ref={fileRef} type="file" accept="image/*" onChange={handleFileUpload} style={{ display: 'none' }} />
+            <input ref={fileRef} type="file" accept="image/*,.pdf,.txt,.csv" onChange={handleFileUpload} style={{ display: 'none' }} />
             <button onClick={() => fileRef.current?.click()} style={{ padding: '8px 16px', borderRadius: 8, border: '1.5px solid var(--border)', background: 'transparent', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', cursor: 'pointer', fontFamily: F, display: 'flex', alignItems: 'center', gap: 6 }}>
-              📷 Upload Screenshot
+              📎 Upload File
             </button>
             {imagePreview && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <img src={imagePreview} alt="Preview" style={{ height: 40, borderRadius: 6, border: '1px solid var(--border)' }} />
                 <button onClick={() => { setImageData(null); setImagePreview(null); setMediaType(null); if (fileRef.current) fileRef.current.value = ''; }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#C4B8A8', fontSize: 16 }}>×</button>
+              </div>
+            )}
+            {pdfData && fileName && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', borderRadius: 8, background: 'var(--subtle-bg)', border: '1px solid var(--border)' }}>
+                <span style={{ fontSize: 16 }}>📄</span>
+                <span style={{ fontSize: 12, color: 'var(--text)', fontFamily: F, fontWeight: 500 }}>{fileName}</span>
+                <button onClick={() => { setPdfData(null); setFileName(null); if (fileRef.current) fileRef.current.value = ''; }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#C4B8A8', fontSize: 16 }}>×</button>
               </div>
             )}
           </div>
@@ -311,7 +354,7 @@ function BookingParser({ cities, stayActions, flights, updateFlights }) {
           )}
 
           <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
-            <button onClick={handleParse} disabled={loading || (!text.trim() && !imageData)} style={{ flex: 1, padding: '12px 0', borderRadius: 10, border: 'none', background: (text.trim() || imageData) && !loading ? 'linear-gradient(135deg,#C45B28,#D4753E)' : '#E8E0D4', color: (text.trim() || imageData) && !loading ? 'white' : '#B0A090', fontSize: 14, fontWeight: 600, cursor: (text.trim() || imageData) && !loading ? 'pointer' : 'default', fontFamily: F }}>
+            <button onClick={handleParse} disabled={loading || (!text.trim() && !imageData && !pdfData)} style={{ flex: 1, padding: '12px 0', borderRadius: 10, border: 'none', background: (text.trim() || imageData || pdfData) && !loading ? 'linear-gradient(135deg,#C45B28,#D4753E)' : '#E8E0D4', color: (text.trim() || imageData || pdfData) && !loading ? 'white' : '#B0A090', fontSize: 14, fontWeight: 600, cursor: (text.trim() || imageData || pdfData) && !loading ? 'pointer' : 'default', fontFamily: F }}>
               {loading ? '⏳ Parsing...' : '🤖 Parse & Import'}
             </button>
           </div>
@@ -440,8 +483,8 @@ function DocumentVault({ cities }) {
             <textarea value={form.content} onChange={e => setForm(f => ({ ...f, content: e.target.value }))} placeholder="Paste confirmation text, notes, etc." style={{ ...inputSt, minHeight: 80, resize: 'vertical' }} />
           </div>
           <div style={{ marginBottom: 14 }}>
-            <input ref={fileRef} type="file" accept="image/*" onChange={handleFileUpload} style={{ display: 'none' }} />
-            <button onClick={() => fileRef.current?.click()} style={{ padding: '8px 16px', borderRadius: 8, border: '1.5px solid var(--border)', background: 'transparent', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', cursor: 'pointer', fontFamily: F }}>📷 Attach Image</button>
+            <input ref={fileRef} type="file" accept="image/*,.pdf,.txt,.csv" onChange={handleFileUpload} style={{ display: 'none' }} />
+            <button onClick={() => fileRef.current?.click()} style={{ padding: '8px 16px', borderRadius: 8, border: '1.5px solid var(--border)', background: 'transparent', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', cursor: 'pointer', fontFamily: F }}>📎 Attach File</button>
             {form.image_url && <img src={form.image_url} alt="Preview" style={{ height: 50, borderRadius: 6, marginLeft: 10, border: '1px solid var(--border)' }} />}
           </div>
           <div style={{ display: 'flex', gap: 10 }}>

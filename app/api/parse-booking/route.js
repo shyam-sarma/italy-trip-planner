@@ -1,6 +1,6 @@
-import Anthropic from '@anthropic-ai/sdk';
+import Anthropic, { toFile } from '@anthropic-ai/sdk';
 
-const SYSTEM_PROMPT = `You are a booking confirmation parser. Extract structured data from the provided booking confirmation (text or image). Return ONLY valid JSON, no markdown, no explanation, no code fences.
+const SYSTEM_PROMPT = `You are a booking confirmation parser. Extract structured data from the provided booking confirmation (text, image, or document). Return ONLY valid JSON, no markdown, no explanation, no code fences.
 
 Determine the booking type and return one of these formats:
 
@@ -23,11 +23,11 @@ export async function POST(request) {
       );
     }
 
-    const { text, image, mediaType } = await request.json();
+    const { text, image, mediaType, pdf, fileName } = await request.json();
 
-    if (!text && !image) {
+    if (!text && !image && !pdf) {
       return Response.json(
-        { success: false, error: 'Please provide booking text or an image.' },
+        { success: false, error: 'Please provide booking text, an image, or a document.' },
         { status: 400 }
       );
     }
@@ -36,25 +36,69 @@ export async function POST(request) {
 
     // Build content array
     const content = [];
+    let uploadedFileId = null;
+
+    // Handle PDF via Files API
+    if (pdf) {
+      const pdfBuffer = Buffer.from(pdf, 'base64');
+      const uploaded = await client.beta.files.upload({
+        file: await toFile(pdfBuffer, fileName || 'document.pdf', { type: 'application/pdf' }),
+        betas: ['files-api-2025-04-14'],
+      });
+      uploadedFileId = uploaded.id;
+      content.push({
+        type: 'document',
+        source: { type: 'file', file_id: uploaded.id },
+      });
+    }
+
+    // Handle images inline (base64)
     if (image && mediaType) {
       content.push({
         type: 'image',
         source: { type: 'base64', media_type: mediaType, data: image },
       });
     }
+
+    // Handle text
     if (text) {
       content.push({ type: 'text', text });
     }
-    if (!text && image) {
-      content.push({ type: 'text', text: 'Parse this booking confirmation image.' });
+
+    // If only file/image with no text, add instruction
+    if (!text && (image || pdf)) {
+      content.push({ type: 'text', text: 'Parse this booking confirmation.' });
     }
 
-    const message = await client.messages.create({
-      model: 'claude-haiku-4-5',
-      max_tokens: 1024,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content }],
-    });
+    // Use beta endpoint if we uploaded a file, otherwise standard
+    let message;
+    if (uploadedFileId) {
+      message = await client.beta.messages.create({
+        model: 'claude-haiku-4-5',
+        max_tokens: 1024,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content }],
+        betas: ['files-api-2025-04-14'],
+      });
+    } else {
+      message = await client.messages.create({
+        model: 'claude-haiku-4-5',
+        max_tokens: 1024,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content }],
+      });
+    }
+
+    // Cleanup: delete uploaded file
+    if (uploadedFileId) {
+      try {
+        await client.beta.files.delete(uploadedFileId, {
+          betas: ['files-api-2025-04-14'],
+        });
+      } catch {
+        // Non-critical, file will expire anyway
+      }
+    }
 
     // Extract text response
     const responseText = message.content
