@@ -16,6 +16,7 @@ A real-time trip planner for the Italy & London trip (May 2026). Both of you can
 4. Go to **SQL Editor** (left sidebar) → click **New Query**
 5. Open the file `supabase-migration.sql` from this repo, copy ALL of it, paste into the editor, and click **Run**
 6. You should see "Success" — this creates all tables and seeds your default cities, packing lists, etc.
+7. Then run `supabase-migration-v2.sql` the same way — it adds the extra columns used by the mobile redesign (cover tones, plan time/kind/ticket, flight pass details). Safe to run on existing installs; uses `IF NOT EXISTS`.
 7. Go to **Settings → API** (left sidebar):
    - Copy the **Project URL** (looks like `https://abc123.supabase.co`)
    - Copy the **anon public** key (the long string)

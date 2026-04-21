@@ -1,0 +1,14 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: #fbf7f0;
+  color: #1c140c;
+  -webkit-font-smoothing: antialiased;
+  font-family: 'Geist', 'Inter', -apple-system, system-ui, sans-serif;
+  overscroll-behavior-y: none;
+}
+body {
+  min-height: 100dvh;
+}
+::selection { background: #d14d4d30; }
+input::placeholder, textarea::placeholder { color: #a69680; }
+input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; }
