@@ -1,7 +1,10 @@
 # Portfolio Site
 
-A self-contained, single-file portfolio site for [@shyam-sarma](https://github.com/shyam-sarma).
-No build step, no dependencies — just open `index.html`.
+A single-file portfolio site for [@shyam-sarma](https://github.com/shyam-sarma),
+designed in an editorial-print style: paper background, Fraunces & Newsreader
+type, newspaper masthead, numbered sections, and a typographic project index.
+No build step — just open `index.html`. (Fonts load from Google Fonts and fall
+back to Georgia offline.)
 
 ## How it works
 
@@ -37,7 +40,10 @@ folder — it's a plain static site).
 
 Open `index.html` and edit:
 
-- **Tagline / hero text** — the `.hero` section near the top of `<body>`.
-- **Username & colors** — `USERNAME` and `LANG_COLORS` in the `<script>` block,
-  and the CSS variables in `:root` for the theme.
-- **Contact links** — the `#contact` section.
+- **Headline / lede copy** — the `.lede` block near the top of `<body>`.
+- **Featured projects** — the hand-written `.feature` articles in `#work`
+  (the `#index` list below them is fully automatic).
+- **Theme** — the CSS variables in `:root` (`--paper`, `--ink`, `--accent`)
+  and the font families at the top.
+- **Username** — `USERNAME` in the `<script>` block.
+- **Contact links** — the `#correspondence` section.

@@ -4,312 +4,423 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Meghashyama Sarma — Portfolio</title>
-<meta name="description" content="Portfolio of Meghashyama Sarma — software developer based in Toronto, Canada." />
+<meta name="description" content="Portfolio of Meghashyama Sarma — software developer based in Toronto, Canada. AI tools, web apps, and data work." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --bg: #0b0f17;
-    --bg-soft: #111827;
-    --card: #151d2b;
-    --card-hover: #1a2436;
-    --border: #232f45;
-    --text: #e6edf7;
-    --muted: #94a3b8;
-    --accent: #5eead4;
-    --accent-2: #818cf8;
-    --radius: 14px;
-    --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --paper: #f7f2e8;
+    --ink: #1c1814;
+    --faded: #6f6455;
+    --rule: rgba(28, 24, 20, 0.22);
+    --rule-soft: rgba(28, 24, 20, 0.12);
+    --accent: #a03518;
+    --serif: "Fraunces", "Iowan Old Style", Georgia, serif;
+    --text: "Newsreader", "Iowan Old Style", Georgia, serif;
+    --mono: "SF Mono", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font);
-    line-height: 1.6;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--text);
+    font-size: 1.05rem;
+    line-height: 1.65;
     -webkit-font-smoothing: antialiased;
   }
-  a { color: var(--accent); text-decoration: none; }
-  a:hover { text-decoration: underline; }
+  ::selection { background: var(--ink); color: var(--paper); }
 
-  .container { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+  a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:hover { color: var(--accent); }
 
-  /* ---------- Header / Nav ---------- */
-  header {
-    position: sticky; top: 0; z-index: 10;
-    background: rgba(11, 15, 23, 0.85);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border);
-  }
-  nav {
-    display: flex; align-items: center; justify-content: space-between;
-    height: 60px;
-  }
-  .logo { font-weight: 700; letter-spacing: 0.02em; color: var(--text); }
-  .logo span { color: var(--accent); }
-  .nav-links { display: flex; gap: 24px; }
-  .nav-links a { color: var(--muted); font-size: 0.95rem; }
-  .nav-links a:hover { color: var(--text); text-decoration: none; }
+  .sheet { max-width: 880px; margin: 0 auto; padding: 0 28px; }
 
-  /* ---------- Hero ---------- */
-  .hero { padding: 90px 0 70px; display: flex; align-items: center; gap: 48px; }
-  .hero-text { flex: 1; }
-  .badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-size: 0.8rem; color: var(--accent);
-    border: 1px solid rgba(94, 234, 212, 0.35);
-    background: rgba(94, 234, 212, 0.08);
-    padding: 5px 12px; border-radius: 999px; margin-bottom: 18px;
+  .label {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--faded);
   }
-  .badge::before {
-    content: ""; width: 8px; height: 8px; border-radius: 50%;
-    background: var(--accent);
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-  h1 {
-    font-size: clamp(2.1rem, 5vw, 3.2rem);
-    line-height: 1.15; font-weight: 800; letter-spacing: -0.02em;
-  }
-  h1 .gradient {
-    background: linear-gradient(90deg, var(--accent), var(--accent-2));
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
-  .tagline { margin-top: 16px; color: var(--muted); font-size: 1.1rem; max-width: 540px; }
-  .hero-cta { margin-top: 28px; display: flex; gap: 14px; flex-wrap: wrap; }
-  .btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 11px 20px; border-radius: 10px; font-weight: 600; font-size: 0.95rem;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-  }
-  .btn:hover { text-decoration: none; transform: translateY(-2px); }
-  .btn-primary { background: linear-gradient(90deg, var(--accent), #34d399); color: #06281f; }
-  .btn-primary:hover { box-shadow: 0 6px 24px rgba(94, 234, 212, 0.25); }
-  .btn-ghost { border: 1px solid var(--border); color: var(--text); background: var(--bg-soft); }
-  .btn-ghost:hover { border-color: var(--accent); }
+  .label a { text-decoration: none; }
+  .label a:hover { color: var(--accent); text-decoration: underline; }
 
-  .avatar-wrap { position: relative; flex-shrink: 0; }
-  .avatar {
-    width: 190px; height: 190px; border-radius: 50%;
-    border: 3px solid var(--border); display: block;
+  /* ---------- Masthead ---------- */
+  .masthead { padding-top: 34px; text-align: center; }
+  .masthead-top {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 10px;
   }
-  .avatar-ring {
-    position: absolute; inset: -10px; border-radius: 50%;
-    border: 2px dashed rgba(129, 140, 248, 0.4);
-    animation: spin 30s linear infinite;
+  .masthead-top .flag { color: var(--accent); }
+  .wordmark {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(2.6rem, 8vw, 5.4rem);
+    letter-spacing: -0.015em;
+    line-height: 1.05;
+    padding: 34px 0 26px;
   }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  .rule-double {
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    height: 5px;
+  }
+  .masthead nav {
+    display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .masthead nav .sep { color: var(--rule); }
 
-  /* ---------- Stats ---------- */
+  /* ---------- Lede ---------- */
+  .lede {
+    padding: 72px 0 8px;
+    display: grid;
+    grid-template-columns: 1fr 200px;
+    gap: 48px;
+    align-items: start;
+  }
+  .kicker { margin-bottom: 20px; }
+  .kicker em { color: var(--accent); font-style: normal; }
+  .headline {
+    font-family: var(--serif);
+    font-weight: 340;
+    font-size: clamp(1.9rem, 4.4vw, 3rem);
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+    margin-bottom: 28px;
+  }
+  .headline em { font-style: italic; font-weight: 420; }
+  .dek { color: var(--ink); max-width: 34em; }
+  .dek::first-letter {
+    font-family: var(--serif);
+    font-weight: 500;
+    float: left;
+    font-size: 3.4em;
+    line-height: 0.82;
+    padding: 4px 10px 0 0;
+  }
+  .dek + .dek { margin-top: 1em; }
+
+  .portrait { text-align: center; }
+  .portrait img {
+    width: 100%; max-width: 200px;
+    display: block;
+    filter: grayscale(1) contrast(1.05);
+    border: 1px solid var(--ink);
+    padding: 6px;
+    background: var(--paper);
+  }
+  .portrait figcaption { margin-top: 10px; }
+
+  /* ---------- Stats colophon ---------- */
   .stats {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 16px; margin: 10px 0 70px;
+    margin: 64px 0 0;
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
   }
-  .stat {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 20px; text-align: center;
+  .stat { padding: 18px 8px 16px; text-align: center; }
+  .stat + .stat { border-left: 1px solid var(--rule-soft); }
+  .stat .num {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 2rem;
+    line-height: 1.1;
   }
-  .stat .num { font-size: 1.7rem; font-weight: 800; color: var(--accent); }
-  .stat .label { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+  .stat .label { display: block; margin-top: 6px; }
 
   /* ---------- Sections ---------- */
-  section { padding: 30px 0 60px; }
-  h2 {
-    font-size: 1.6rem; font-weight: 700; margin-bottom: 8px;
-    display: flex; align-items: center; gap: 12px;
+  section { padding-top: 88px; }
+  .section-head {
+    display: flex; align-items: baseline; gap: 18px;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 10px;
+    margin-bottom: 8px;
   }
-  h2::after {
-    content: ""; flex: 1; height: 1px;
-    background: linear-gradient(90deg, var(--border), transparent);
+  .section-head .no { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.1em; color: var(--accent); }
+  .section-head h2 {
+    font-family: var(--serif);
+    font-weight: 460;
+    font-size: 1.5rem;
+    letter-spacing: 0.01em;
   }
-  .section-sub { color: var(--muted); margin-bottom: 28px; font-size: 0.95rem; }
+  .section-head .aside { margin-left: auto; }
+  .section-note { padding: 14px 0 6px; color: var(--faded); font-style: italic; }
 
-  /* ---------- Projects ---------- */
-  .projects-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 18px;
+  /* ---------- Practice (What I do) ---------- */
+  .practice { display: grid; grid-template-columns: repeat(3, 1fr); }
+  .practice-col { padding: 26px 26px 6px 0; }
+  .practice-col + .practice-col { border-left: 1px solid var(--rule-soft); padding-left: 26px; }
+  .practice-col h3 {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 460;
+    font-size: 1.16rem;
+    margin-bottom: 10px;
   }
-  .project-card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 22px;
-    display: flex; flex-direction: column; gap: 12px;
-    transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  .practice-col p { font-size: 0.98rem; color: var(--ink); }
+  .practice-col .label { display: block; margin-top: 14px; line-height: 2; }
+
+  /* ---------- Selected work ---------- */
+  .feature { display: grid; grid-template-columns: 64px 1fr; padding: 30px 0; border-bottom: 1px solid var(--rule-soft); }
+  .feature:last-child { border-bottom: 0; }
+  .feature .no { font-family: var(--mono); font-size: 0.8rem; color: var(--accent); padding-top: 10px; }
+  .feature h3 {
+    font-family: var(--serif);
+    font-weight: 460;
+    font-size: 1.7rem;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
   }
-  .project-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(94, 234, 212, 0.5);
-    background: var(--card-hover);
+  .feature h3 a { text-decoration: none; }
+  .feature h3 a:hover { color: var(--accent); text-decoration: underline; text-decoration-thickness: 1.5px; }
+  .feature .meta { margin: 6px 0 10px; }
+  .feature p { max-width: 40em; }
+
+  /* ---------- Project index ---------- */
+  .index-list { list-style: none; }
+  .index-row {
+    display: grid;
+    grid-template-columns: 52px 1fr auto;
+    gap: 0 18px;
+    align-items: baseline;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--rule-soft);
   }
-  .project-card h3 { font-size: 1.05rem; font-weight: 700; word-break: break-word; }
-  .project-card h3 a { color: var(--text); }
-  .project-card h3 a:hover { color: var(--accent); text-decoration: none; }
-  .project-desc { color: var(--muted); font-size: 0.9rem; flex: 1; }
-  .project-meta {
-    display: flex; align-items: center; gap: 16px;
-    font-size: 0.8rem; color: var(--muted); flex-wrap: wrap;
+  .index-row .idx { font-family: var(--mono); font-size: 0.75rem; color: var(--faded); }
+  .index-name {
+    font-family: var(--serif);
+    font-weight: 460;
+    font-size: 1.14rem;
+    text-decoration: none;
   }
-  .lang-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; vertical-align: -1px; }
-  .meta-item { display: inline-flex; align-items: center; gap: 4px; }
-  .topics { display: flex; flex-wrap: wrap; gap: 6px; }
-  .topic {
-    font-size: 0.72rem; color: var(--accent-2);
-    background: rgba(129, 140, 248, 0.1);
-    border: 1px solid rgba(129, 140, 248, 0.25);
-    padding: 2px 9px; border-radius: 999px;
-  }
-  .loading, .error-box {
-    color: var(--muted); text-align: center; padding: 40px 0; grid-column: 1 / -1;
-  }
-  .error-box a { font-weight: 600; }
+  .index-name:hover { color: var(--accent); text-decoration: underline; }
+  .index-desc { color: var(--faded); font-size: 0.95rem; margin-top: 2px; max-width: 36em; }
+  .index-meta { text-align: right; white-space: nowrap; }
+  .placeholder { padding: 26px 0; color: var(--faded); font-style: italic; }
 
   /* ---------- Languages ---------- */
-  .lang-bar {
-    display: flex; height: 14px; border-radius: 999px; overflow: hidden;
-    border: 1px solid var(--border); margin-bottom: 18px;
+  .lang-list { list-style: none; padding-top: 10px; }
+  .lang-row {
+    display: grid;
+    grid-template-columns: 170px 1fr 52px;
+    gap: 18px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--rule-soft);
   }
-  .lang-legend { display: flex; flex-wrap: wrap; gap: 14px 22px; font-size: 0.85rem; color: var(--muted); }
+  .lang-row .track { height: 5px; background: transparent; border: 1px solid var(--rule); }
+  .lang-row .fill { height: 100%; background: var(--ink); }
+  .lang-row:first-child .fill { background: var(--accent); }
+  .lang-row .pct { text-align: right; font-family: var(--mono); font-size: 0.75rem; color: var(--faded); }
 
-  /* ---------- Contact ---------- */
-  .contact-card {
-    background: linear-gradient(135deg, rgba(94, 234, 212, 0.07), rgba(129, 140, 248, 0.07));
-    border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 44px 32px; text-align: center;
+  /* ---------- Correspondence ---------- */
+  .correspondence { text-align: center; padding-bottom: 20px; }
+  .correspondence .invite {
+    font-family: var(--serif);
+    font-weight: 340;
+    font-style: italic;
+    font-size: clamp(1.5rem, 3.4vw, 2.2rem);
+    line-height: 1.3;
+    max-width: 22em;
+    margin: 34px auto 26px;
   }
-  .contact-card p { color: var(--muted); max-width: 480px; margin: 10px auto 24px; }
+  .correspondence .addresses { display: flex; justify-content: center; gap: 28px; flex-wrap: wrap; }
 
-  footer {
-    border-top: 1px solid var(--border);
-    padding: 28px 0; text-align: center;
-    color: var(--muted); font-size: 0.85rem;
+  /* ---------- Footer ---------- */
+  footer { margin-top: 88px; }
+  footer .rule-double { border-color: var(--ink); }
+  .colophon {
+    display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    padding: 14px 0 40px;
   }
 
-  @media (max-width: 720px) {
-    .hero { flex-direction: column-reverse; text-align: center; padding: 56px 0 40px; gap: 32px; }
-    .tagline { margin-left: auto; margin-right: auto; }
-    .hero-cta { justify-content: center; }
-    .nav-links { display: none; }
+  @media (max-width: 700px) {
+    body { font-size: 1rem; }
+    .masthead-top { font-size: 0.62rem; }
+    .lede { grid-template-columns: 1fr; gap: 36px; padding-top: 52px; }
+    .portrait { order: -1; }
+    .portrait img { margin: 0 auto; max-width: 150px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .stat:nth-child(3) { border-left: 0; }
+    .stat:nth-child(n+3) { border-top: 1px solid var(--rule-soft); }
+    .practice { grid-template-columns: 1fr; }
+    .practice-col { padding: 22px 0 6px; }
+    .practice-col + .practice-col { border-left: 0; border-top: 1px solid var(--rule-soft); padding-left: 0; }
+    .feature { grid-template-columns: 1fr; gap: 4px; }
+    .index-row { grid-template-columns: 1fr; gap: 2px; }
+    .index-row .idx { display: none; }
+    .index-meta { text-align: left; white-space: normal; }
+    .lang-row { grid-template-columns: 110px 1fr 46px; gap: 12px; }
+    section { padding-top: 64px; }
+    .section-head { gap: 12px; }
+    .section-head .aside { display: none; }
   }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="container">
-    <nav>
-      <div class="logo">meghashyama<span>.dev</span></div>
-      <div class="nav-links">
-        <a href="#about">What I do</a>
-        <a href="#projects">Projects</a>
-        <a href="#languages">Languages</a>
-        <a href="#contact">Contact</a>
-      </div>
-    </nav>
+<header class="masthead sheet">
+  <div class="masthead-top label">
+    <span>Portfolio · MMXXVI</span>
+    <span>Toronto, Canada</span>
+    <span class="flag">Open to opportunities</span>
   </div>
+  <h1 class="wordmark">Meghashyama Sarma</h1>
+  <div class="rule-double"></div>
+  <nav class="label">
+    <a href="#practice">Practice</a><span class="sep">·</span>
+    <a href="#work">Selected Work</a><span class="sep">·</span>
+    <a href="#index">Index</a><span class="sep">·</span>
+    <a href="#languages">Languages</a><span class="sep">·</span>
+    <a href="#correspondence">Correspondence</a>
+  </nav>
 </header>
 
-<main class="container">
+<main class="sheet">
 
-  <section class="hero">
-    <div class="hero-text">
-      <div class="badge">Open to opportunities</div>
-      <h1>Hi, I'm <span class="gradient">Meghashyama Sarma</span></h1>
-      <p class="tagline">
-        Developer based in Toronto, Canada 🇨🇦 — I build AI-powered tools and agents,
-        full-stack web apps, and data dashboards that turn ideas into working products.
+  <div class="lede">
+    <div>
+      <p class="kicker label"><em>Software developer</em> — est. 2018 on GitHub</p>
+      <h2 class="headline">Building <em>AI-powered tools</em>, full-stack web applications &amp; <em>data work</em> that ships.</h2>
+      <p class="dek">
+        From autonomous agents on the Claude and Gemini APIs to a collaborative
+        trip planner in Next.js and Supabase, my work runs the span between
+        machine intelligence and the interfaces people actually use. Earlier
+        chapters cover analytics — Streamlit dashboards, exploratory notebooks,
+        and dbt models — a foundation in data that still shapes how I build.
       </p>
-      <div class="hero-cta">
-        <a class="btn btn-primary" href="#projects">View my work</a>
-        <a class="btn btn-ghost" href="https://github.com/shyam-sarma" target="_blank" rel="noopener">GitHub profile ↗</a>
-      </div>
     </div>
-    <div class="avatar-wrap">
-      <div class="avatar-ring"></div>
-      <img class="avatar" src="https://avatars.githubusercontent.com/u/42867144?v=4" alt="Meghashyama Sarma" />
-    </div>
-  </section>
-
-  <div class="stats" id="stats">
-    <div class="stat"><div class="num" id="stat-repos">–</div><div class="label">Public repos</div></div>
-    <div class="stat"><div class="num" id="stat-stars">–</div><div class="label">Stars earned</div></div>
-    <div class="stat"><div class="num" id="stat-followers">–</div><div class="label">Followers</div></div>
-    <div class="stat"><div class="num" id="stat-years">–</div><div class="label">Years on GitHub</div></div>
+    <figure class="portrait">
+      <img src="https://avatars.githubusercontent.com/u/42867144?v=4" alt="Portrait of Meghashyama Sarma" />
+      <figcaption class="label">Toronto, Canada</figcaption>
+    </figure>
   </div>
 
-  <section id="about">
-    <h2>What I do</h2>
-    <div class="projects-grid">
-      <article class="project-card">
-        <h3>🤖 AI &amp; LLM applications</h3>
-        <p class="project-desc">
-          Building with the Claude and Gemini APIs — autonomous agents like a finance
-          research agent, marketing content generation tools, and generative audio
-          deployed on RunPod.
-        </p>
-        <div class="topics">
-          <span class="topic">Claude API</span><span class="topic">Gemini API</span>
-          <span class="topic">Agents</span><span class="topic">Python</span>
-        </div>
-      </article>
-      <article class="project-card">
-        <h3>🌐 Full-stack web apps</h3>
-        <p class="project-desc">
-          End-to-end products with Next.js, TypeScript, and Supabase — from a
-          collaborative Italy trip planner with a mobile-first redesign to landing
-          pages and SaaS prototypes.
-        </p>
-        <div class="topics">
-          <span class="topic">Next.js</span><span class="topic">TypeScript</span>
-          <span class="topic">Supabase</span><span class="topic">React</span>
-        </div>
-      </article>
-      <article class="project-card">
-        <h3>📊 Data &amp; analytics</h3>
-        <p class="project-desc">
-          Interactive dashboards and exploratory analysis — Streamlit marketing
-          dashboards, SaaS metrics EDA in Jupyter, and data modeling with dbt.
-        </p>
-        <div class="topics">
-          <span class="topic">Streamlit</span><span class="topic">Jupyter</span>
-          <span class="topic">dbt</span><span class="topic">pandas</span>
-        </div>
-      </article>
+  <div class="stats" id="stats">
+    <div class="stat"><div class="num" id="stat-repos">–</div><span class="label">Public repos</span></div>
+    <div class="stat"><div class="num" id="stat-stars">–</div><span class="label">Stars earned</span></div>
+    <div class="stat"><div class="num" id="stat-followers">–</div><span class="label">Followers</span></div>
+    <div class="stat"><div class="num" id="stat-years">–</div><span class="label">Years on GitHub</span></div>
+  </div>
+
+  <section id="practice">
+    <div class="section-head">
+      <span class="no">№ 01</span>
+      <h2>Practice</h2>
+      <span class="aside label">Three disciplines</span>
+    </div>
+    <div class="practice">
+      <div class="practice-col">
+        <h3>Artificial intelligence</h3>
+        <p>Agents and applied LLM work — a finance research agent, marketing
+        content generation with Gemini, Claude API integrations, and generative
+        audio deployed on RunPod.</p>
+        <span class="label">Claude API · Gemini · Python</span>
+      </div>
+      <div class="practice-col">
+        <h3>Web applications</h3>
+        <p>End-to-end products in Next.js and TypeScript with Supabase behind
+        them — most recently a collaborative Italy trip planner with a
+        mobile-first redesign.</p>
+        <span class="label">Next.js · TypeScript · Supabase</span>
+      </div>
+      <div class="practice-col">
+        <h3>Data &amp; analytics</h3>
+        <p>Dashboards and analysis that make numbers legible — Streamlit
+        marketing dashboards, SaaS-metrics EDA in Jupyter, and data modeling
+        with dbt.</p>
+        <span class="label">Streamlit · Jupyter · dbt</span>
+      </div>
     </div>
   </section>
 
-  <section id="projects">
-    <h2>Projects</h2>
-    <p class="section-sub">Pulled live from my GitHub — sorted by most recently active.</p>
-    <div class="projects-grid" id="projects-grid">
-      <div class="loading">Loading projects from GitHub…</div>
+  <section id="work">
+    <div class="section-head">
+      <span class="no">№ 02</span>
+      <h2>Selected work</h2>
+      <span class="aside label">Editor's picks</span>
     </div>
+
+    <article class="feature">
+      <span class="no">i.</span>
+      <div>
+        <h3><a href="https://github.com/shyam-sarma/italy-trip-planner" target="_blank" rel="noopener">Italy Trip Planner</a></h3>
+        <div class="meta label">Next.js · Supabase · JavaScript</div>
+        <p>A collaborative trip-planning application with a mobile-first,
+        passport-motif redesign — realtime itineraries backed by Supabase,
+        built to be used in the field, not just demoed.</p>
+      </div>
+    </article>
+
+    <article class="feature">
+      <span class="no">ii.</span>
+      <div>
+        <h3><a href="https://github.com/shyam-sarma/Finance_Agent" target="_blank" rel="noopener">Finance Agent</a></h3>
+        <div class="meta label">Python · LLM agents</div>
+        <p>An autonomous research agent for financial questions — decomposing a
+        query, gathering evidence, and assembling an answer without a human in
+        the loop.</p>
+      </div>
+    </article>
+
+    <article class="feature">
+      <span class="no">iii.</span>
+      <div>
+        <h3><a href="https://github.com/shyam-sarma/gemini-marketing-content-tool" target="_blank" rel="noopener">Gemini Marketing Content Tool</a></h3>
+        <div class="meta label">TypeScript · Gemini API</div>
+        <p>A content-generation tool for marketing teams built on the Gemini
+        API — structured prompts in, publishable copy out.</p>
+      </div>
+    </article>
+  </section>
+
+  <section id="index">
+    <div class="section-head">
+      <span class="no">№ 03</span>
+      <h2>Project index</h2>
+      <span class="aside label"><a href="https://github.com/shyam-sarma?tab=repositories" target="_blank" rel="noopener">Complete archive ↗</a></span>
+    </div>
+    <p class="section-note">Every public repository, drawn live from GitHub and ordered by most recent activity.</p>
+    <ul class="index-list" id="index-list">
+      <li class="placeholder">Consulting the archives…</li>
+    </ul>
   </section>
 
   <section id="languages">
-    <h2>Languages</h2>
-    <p class="section-sub">Language breakdown across my public repositories.</p>
-    <div class="lang-bar" id="lang-bar"></div>
-    <div class="lang-legend" id="lang-legend"></div>
+    <div class="section-head">
+      <span class="no">№ 04</span>
+      <h2>Languages</h2>
+      <span class="aside label">Share of repositories</span>
+    </div>
+    <ul class="lang-list" id="lang-list"></ul>
   </section>
 
-  <section id="contact">
-    <h2>Contact</h2>
-    <div class="contact-card">
-      <h3 style="font-size:1.3rem;">Let's build something together</h3>
-      <p>I'm open to new opportunities and collaborations. The fastest way to reach me is by email, or find me on GitHub.</p>
-      <div class="hero-cta" style="justify-content:center;">
-        <a class="btn btn-primary" href="mailto:shyama.gowra@gmail.com">Email me</a>
-        <a class="btn btn-ghost" href="https://github.com/shyam-sarma" target="_blank" rel="noopener">@shyam-sarma ↗</a>
-      </div>
+  <section id="correspondence" class="correspondence">
+    <div class="section-head">
+      <span class="no">№ 05</span>
+      <h2>Correspondence</h2>
+    </div>
+    <p class="invite">Open to new opportunities and collaborations — the writing desk is always attended.</p>
+    <div class="addresses label">
+      <a href="mailto:shyama.gowra@gmail.com">shyama.gowra@gmail.com</a>
+      <a href="https://github.com/shyam-sarma" target="_blank" rel="noopener">github.com/shyam-sarma</a>
     </div>
   </section>
 
 </main>
 
-<footer>
-  <div class="container">
-    © <span id="year"></span> Meghashyama Sarma · Built with plain HTML/CSS/JS · Data via the GitHub API
+<footer class="sheet">
+  <div class="rule-double"></div>
+  <div class="colophon label">
+    <span>© <span id="year"></span> Meghashyama Sarma</span>
+    <span>Set in Fraunces &amp; Newsreader</span>
+    <span>Data via the GitHub API</span>
   </div>
 </footer>
 
@@ -317,26 +428,10 @@
 (function () {
   const USERNAME = "shyam-sarma";
   const JOINED_YEAR = 2018;
-  // GitHub's linguist colors for common languages
-  const LANG_COLORS = {
-    JavaScript: "#f1e05a", TypeScript: "#3178c6", Python: "#3572A5",
-    HTML: "#e34c26", CSS: "#563d7c", Java: "#b07219", "C#": "#178600",
-    "C++": "#f34b7d", C: "#555555", Go: "#00ADD8", Rust: "#dea584",
-    Ruby: "#701516", PHP: "#4F5D95", Swift: "#F05138", Kotlin: "#A97BFF",
-    Dart: "#00B4AB", Shell: "#89e051", "Jupyter Notebook": "#DA5B0B",
-    Vue: "#41b883", SCSS: "#c6538c", PLpgSQL: "#336790", Dockerfile: "#384d54",
-  };
-  const langColor = (l) => LANG_COLORS[l] || "#8b949e";
 
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  const grid = document.getElementById("projects-grid");
-
-  function showError() {
-    grid.innerHTML =
-      '<div class="error-box">Couldn’t load projects right now (the GitHub API may be rate-limited). ' +
-      'Browse them directly at <a href="https://github.com/' + USERNAME + '?tab=repositories" target="_blank" rel="noopener">github.com/' + USERNAME + '</a>.</div>';
-  }
+  const list = document.getElementById("index-list");
 
   function esc(s) {
     const d = document.createElement("div");
@@ -344,26 +439,34 @@
     return d.innerHTML;
   }
 
-  function renderProjects(repos) {
+  function showError() {
+    list.innerHTML =
+      '<li class="placeholder">The archive could not be reached just now (the GitHub API may be rate-limited). ' +
+      'Browse it directly at <a href="https://github.com/' + USERNAME + '?tab=repositories" target="_blank" rel="noopener">github.com/' + USERNAME + "</a>.</li>";
+  }
+
+  function roman(n) {
+    const table = [[10, "x"], [9, "ix"], [5, "v"], [4, "iv"], [1, "i"]];
+    let out = "";
+    table.forEach(function (t) { while (n >= t[0]) { out += t[1]; n -= t[0]; } });
+    return out;
+  }
+
+  function renderIndex(repos) {
     if (!repos.length) { showError(); return; }
-    grid.innerHTML = repos.map(function (r) {
-      const topics = (r.topics || []).slice(0, 4)
-        .map(function (t) { return '<span class="topic">' + esc(t) + "</span>"; }).join("");
-      const updated = new Date(r.pushed_at).toLocaleDateString(undefined, { year: "numeric", month: "short" });
+    list.innerHTML = repos.map(function (r, i) {
+      const year = new Date(r.pushed_at).getFullYear();
+      const meta = [r.language, r.stargazers_count ? "★ " + r.stargazers_count : null, year]
+        .filter(Boolean).map(esc).join(" · ");
       return (
-        '<article class="project-card">' +
-          "<h3><a href=\"" + r.html_url + '" target="_blank" rel="noopener">' + esc(r.name) + "</a></h3>" +
-          '<p class="project-desc">' + esc(r.description || "No description yet — check out the code.") + "</p>" +
-          (topics ? '<div class="topics">' + topics + "</div>" : "") +
-          '<div class="project-meta">' +
-            (r.language
-              ? '<span class="meta-item"><span class="lang-dot" style="background:' + langColor(r.language) + '"></span>' + esc(r.language) + "</span>"
-              : "") +
-            '<span class="meta-item">★ ' + r.stargazers_count + "</span>" +
-            '<span class="meta-item">⑂ ' + r.forks_count + "</span>" +
-            '<span class="meta-item">Updated ' + updated + "</span>" +
+        '<li class="index-row">' +
+          '<span class="idx">' + roman(i + 1) + ".</span>" +
+          "<div>" +
+            '<a class="index-name" href="' + r.html_url + '" target="_blank" rel="noopener">' + esc(r.name) + "</a>" +
+            '<p class="index-desc">' + esc(r.description || "Undocumented — the code speaks for itself.") + "</p>" +
           "</div>" +
-        "</article>"
+          '<span class="index-meta label">' + meta + "</span>" +
+        "</li>"
       );
     }).join("");
   }
@@ -377,13 +480,17 @@
       document.getElementById("languages").style.display = "none";
       return;
     }
-    document.getElementById("lang-bar").innerHTML = entries.map(function (e) {
-      const pct = (e[1] / total) * 100;
-      return '<div style="width:' + pct + "%;background:" + langColor(e[0]) + '" title="' + esc(e[0]) + '"></div>';
-    }).join("");
-    document.getElementById("lang-legend").innerHTML = entries.map(function (e) {
+    const max = entries[0][1];
+    document.getElementById("lang-list").innerHTML = entries.map(function (e) {
       const pct = Math.round((e[1] / total) * 100);
-      return '<span><span class="lang-dot" style="background:' + langColor(e[0]) + '"></span>' + esc(e[0]) + " · " + pct + "%</span>";
+      const width = Math.round((e[1] / max) * 100);
+      return (
+        '<li class="lang-row">' +
+          "<span>" + esc(e[0]) + "</span>" +
+          '<span class="track"><span class="fill" style="width:' + width + '%;display:block;"></span></span>' +
+          '<span class="pct">' + pct + "%</span>" +
+        "</li>"
+      );
     }).join("");
   }
 
@@ -408,7 +515,7 @@
         // skip forks, archived repos, and the profile-README repo
         return !r.fork && !r.archived && r.name.toLowerCase() !== USERNAME;
       });
-      renderProjects(repos);
+      renderIndex(repos);
       renderLanguages(repos);
       renderStats(user, repos);
     })
